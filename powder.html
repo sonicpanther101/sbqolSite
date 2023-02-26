@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="main.css">
+		<title>Powder</title>
+		<link rel="icon" type="image/x-icon" href="icon.png">
+        <a class="logo" href="index.html">
+                <img src="logo.png" alt="Hypixel" height="50px">
+        </a>
+        <nav>
+            <a class="menu leftest active" href="powder.html">Powder</a><a class="menu" href="Item searcher.html">Price checker</a><a class="menu" href="bits.html">Bits</a><a class="menu" href="flipper.html">Flipper</a>
+        </nav>
+	</head>
+	<body>
+	<center><div class="transback">
+			<label class="powder" for="input-1">Enter current Mole level: </label>
+			<input type="number" class="powderin" id="input-1" style="width: 40px;" max="190" min="0" value="1" pattern="\d*" oninput="validity.valid||(value='');"/>
+			<br>
+			<label class="powder" for="input-2">Enter current Powder Buff level: </label>
+			<input type="number" class="powderin" id="input-2" style="width: 40px;" max="50" min="0" value="1" pattern="\d*" oninput="validity.valid||(value='');"/>
+			<br>
+			<label class="powder" for="input-3">Enter current Great Explorer level: </label>
+			<input type="number" class="powderin" id="input-3" style="width: 40px;" max="20" min="0" value="1" pattern="\d*" oninput="validity.valid||(value='');"/>
+			<br>
+			<table>
+			  <tr>
+				<th>Perk</th>
+				<th>Cost/Effectiveness</th>
+				<th>Powder Cost</th>
+			  </tr>
+			  <tr>
+				<td>Mole:</td>
+				<td class="lowest" id="result-1">1</td>
+				<td id="cost-1">1</td>
+			  </tr>
+			  <tr>
+				<td>Powder Buff:</td>
+				<td id="result-2">3</td>
+				<td id="cost-2">1</td>
+			  </tr>
+			  <tr>
+				<td>Great Explorer:</td>
+				<td class="lowest" id="result-3">1</td>
+				<td id="cost-3">1</td>
+			  </tr>
+			</table>
+			<p>
+				The lowest (<span class="lowest">Green</span>) one is the one you should upgrade next
+			</p>
+		  </div></center>		  
+		<script>
+const input1 = document.getElementById('input-1');
+const input2 = document.getElementById('input-2');
+const input3 = document.getElementById('input-3');
+const result1 = document.getElementById('result-1');
+const result2 = document.getElementById('result-2');
+const result3 = document.getElementById('result-3');
+const cost1 = document.getElementById('cost-1');
+const cost2 = document.getElementById('cost-2');
+const cost3 = document.getElementById('cost-3');
+input1.addEventListener('input', () => {
+	cost1.textContent = (Math.round((Number(input1.value) + 1)**2.2)).toLocaleString("en-US");
+	if (Number(input1.value) >= 190) {
+	result1.textContent ="Maxed";
+} else {
+  const between1 = Math.round(((Number(input1.value) + 1)**2.2)/(995/190));
+  const betweenfor1 = Intl.NumberFormat('en-US');
+  result1.textContent = betweenfor1.format(between1);
+}
+checkLowest();
+});
+
+input2.addEventListener('input', () => {
+	cost2.textContent = (Math.round((Number(input2.value) + 1)**3.2)).toLocaleString("en-US");
+	if (Number(input2.value) >= 50) {
+	result1.textContent ="Maxed";
+} else {
+  const between2 = Math.round(((Number(input2.value) + 1)**3.2)/3);
+  const betweenfor2 = Intl.NumberFormat('en-US');
+  result2.textContent = betweenfor2.format(between2);
+}
+checkLowest();
+});
+
+input3.addEventListener('input', () => {
+	cost3.textContent = (Math.round((Number(input3.value) + 1)**4)).toLocaleString("en-US");
+	if (Number(input3.value) >= 20) {
+	result3.textContent ="Maxed";
+} else {
+  const between3 = Math.round(((Number(input3.value) + 1)**4)/29);
+  const betweenfor3 = Intl.NumberFormat('en-US');
+  result3.textContent = betweenfor3.format(between3);
+}
+checkLowest();
+});
+
+function checkLowest() {
+  // remove green class from all results
+  result1.classList.remove('lowest');
+  result2.classList.remove('lowest');
+  result3.classList.remove('lowest');
+
+  // remove commas from results and convert to Number
+  const result1Val = Number(result1.textContent.replace(/,/g, ''));
+  const result2Val = Number(result2.textContent.replace(/,/g, ''));
+  const result3Val = Number(result3.textContent.replace(/,/g, ''));
+
+  // compare values and set lowest to green
+  if (result1Val <= result2Val && result1Val <= result3Val) {
+    result1.classList.add('lowest');
+  } 
+  if (result2Val <= result1Val && result2Val <= result3Val) {
+    result2.classList.add('lowest');
+  } 
+  if (result3Val <= result2Val && result3Val <= result1Val) {
+    result3.classList.add('lowest');
+  }
+}
+		</script>
+	</body>
+</html>

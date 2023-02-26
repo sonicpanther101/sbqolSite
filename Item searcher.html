@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="main.css">
+		<title>Price checker</title>
+		<link rel="icon" type="image/x-icon" href="icon.png">
+        <a class="logo" href="index.html">
+                <img src="logo.png" alt="Hypixel" height="50px">
+        </a>
+        <nav>
+            <a class="menu leftest" href="powder.html">Powder</a><a class="menu active" href="Item searcher.html">Price checker</a><a class="menu" href="bits.html">Bits</a><a class="menu" href="flipper.html">Flipper</a>
+        </nav>
+	</head>
+	<center><body>
+    <div class="transbacknomar" style="width: fit-content;"><label for="item-name">Enter Item Name:</label>
+    <input type="text" id="item-name" name="item-name" placeholder="Ex: Diamond Sword" value="Crystal Fragment">
+    <button onclick="loadAuctions()">Load Auctions</button></div>
+    <div><br></div>
+		<table class="transbacknomar">
+            <tr>
+              <th>No.</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Last Updated</th>
+              <th>Start Time</th>
+            </tr>
+            <tbody id="data"></tbody>
+          </table>
+          
+          <script>
+function loadAuctions() {
+  let input = document.querySelector("input[name='item-name']").value;
+  fetch("https://api.hypixel.net/skyblock/auctions")
+  .then(response => response.json())
+  .then(data => {
+    let total_pages = Number(data.totalPages);
+    console.log(total_pages);
+    let output = "";
+    let Auctions = [];
+    let promises = [];
+for (let pages = 0; pages < total_pages; pages++) {
+  promises.push(fetch(`https://api.hypixel.net/skyblock/auctions?page=${pages}`).then(response => response.json()));
+}
+Promise.all(promises)
+  .then(data => {
+    for (let i = 0; i < data.length; i++) {
+      let newAuctions = data[i].auctions.filter(auction => auction.bin === true & auction.claimed === false & auction.item_name.toLowerCase().includes(input.toLowerCase()));
+      Auctions = Auctions.concat(newAuctions);
+    }
+    Auctions.sort(function(a, b) {
+    return (a.starting_bid) - (b.starting_bid);
+    });
+    for (let i = 0; i < Auctions.length; i++) {
+        let startTime = new Date(Auctions[i].start).toLocaleString();
+        let lastUpdated = new Date(Auctions[i].last_updated).toLocaleString();
+        output += `<tr>
+                    <td>No. ${i+1}</td>
+                    <td>${Auctions[i].item_name}</td>
+                    <td>$${(Auctions[i].starting_bid)/1000000}m</td>
+                    <td>${lastUpdated}</td>
+                    <td>${startTime}</td>
+                  </tr>`;
+    }
+    document.getElementById("data").innerHTML = output;
+})})}
+          </script>
+          
+	</body></html></center>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="main.css">
+		<title>Bits</title>
+		<link rel="icon" type="image/x-icon" href="icon.png">
+        <a class="logo" href="index.html">
+                <img src="logo.png" alt="Hypixel" height="50px">
+        </a>
+        <nav>
+            <a class="menu leftest" href="powder.html">Powder</a><a class="menu" href="Item searcher.html">Price checker</a><a class="menu active" href="bits.html">Bits</a><a class="menu" href="flipper.html">Flipper</a>
+        </nav>
+	</head>
+	<body>
+    <center><div class="transbacknomar" style="padding: 5px,10px,5px,10px; width: 900px">
+    <label for="fame">Enter Fame Rank Bits Multiplier:</label>
+    <input type="text" id="fame" name="fame" placeholder="Ex: 1 (for starter fame)" value="1" required>
+    <input type="submit" value="Load Auctions" onclick="loadAuctions()">
+    <p>Latest update: <span id="lastupdated"></span></p></div>
+    <div><br></div>
+		<table class="transback">
+            <tr>
+              <th>No.</th>
+              <th>Name</th>
+              <th>Coins/Bit</th>
+              <th>Bits Cost</th>
+              <th>Sell Price</th>
+              <th>Profit/Cookie</th>
+            </tr>
+            <tbody id="data"></tbody>
+          </table></center>
+          <div><br></div>
+          <center><p class="transbacknomar" style="width: 20%; color: maroon;">Fame Multiplier Key</p></center>
+          <center><table style="font-size: medium;" class="transbacknomar">
+            <tr>
+              <th>Rank Name</th>
+              <th>Number Multiplier</th>
+            </tr>
+            <tr>
+              <td>New Player</td>
+              <td>1x Bits</td>
+            </tr>
+            <tr>
+              <td>Selttler</td>
+              <td>1.1x Bits</td>
+            </tr>
+            <tr>
+              <td>Citizen</td>
+              <td>1.2x Bits</td>
+            </tr>
+            <tr>
+              <td>Contributer</td>
+              <td>1.3x Bits</td>
+            </tr>
+            <tr>
+              <td>Philanthropist</td>
+              <td>1.4x Bits</td>
+            </tr>
+            <tr>
+              <td>Patron</td>
+              <td>1.6x Bits</td>
+            </tr>
+            <tr>
+              <td>Famous Player</td>
+              <td>1.8x Bits</td>
+            </tr>
+            <tr>
+              <td>Attache</td>
+              <td>1.9x Bits</td>
+            </tr>
+            <tr>
+              <td>Ambassador</td>
+              <td>2x Bits</td>
+            </tr>
+            <tr>
+              <td>Stateperson</td>
+              <td>2.04x Bits</td>
+            </tr>
+            <tr>
+              <td>Senator</td>
+              <td>2.08x Bits</td>
+            </tr>
+            <tr>
+              <td>Dignitary</td>
+              <td>2.12x Bits</td>
+            </tr>
+            <tr>
+              <td>Councilor</td>
+              <td>2.16x Bits</td>
+            </tr>
+            <tr>
+              <td>Minister</td>
+              <td>2.20x Bits</td>
+            </tr>
+            <tr>
+              <td>Premier</td>
+              <td>2.22x Bits</td>
+            </tr>
+            <tr>
+              <td>Chancellor</td>
+              <td>2.24x Bits</td>
+            </tr>
+            <tr>
+              <td>Supreme</td>
+              <td>2.26x Bits</td>
+            </tr>
+          </table></center>
+          <script>
+    let isRunning = false
+    document.getElementById("data").innerHTML = localStorage.getItem("last_use");
+    document.getElementById("lastupdated").innerHTML = localStorage.getItem("last_use_date");
+async function loadAuctions() {
+  if (isRunning) {
+    console.log("The function is already running, skipping execution.");
+    return;
+  } try {
+  isRunning = true;
+  var fame = document.getElementById("fame").value;
+  if (fame === "") {
+    alert("Please enter a value for Fame Rank Bits Multiplier");
+    return;
+  }
+  console.log("start");
+  fetch("https://api.hypixel.net/skyblock/auctions")
+  .then(response => response.json())
+  .then(data => {
+    let newAuction = data.auctions.filter(auction => auction.bin === true);
+    date = [new Date(newAuction[0].last_updated).toLocaleString(),",    Last Bits Multiplier Used: ",document.querySelector("input[name='fame']").value,"x"];
+    let total_pages = Number(data.totalPages);
+    fetch("https://api.hypixel.net/skyblock/bazaar")
+  .then(response => response.json())
+  .then(data => {
+        let cookieprice = Number(data.products.BOOSTER_COOKIE.quick_status.buyPrice);
+    let bitspercookie = 4800*(document.querySelector("input[name='fame']").value);
+    output = [];
+    let promises = [];
+    let bzbitscost = [4000,4000,4000,4000,6000];
+    let bzitems = ['ENCHANTMENT_EXPERTISE_1', 'ENCHANTMENT_COMPACT_1', 'ENCHANTMENT_CULTIVATING_1', 
+    'ENCHANTMENT_CHAMPION_1', 'ENCHANTMENT_HECATOMB_1'];
+    let ahbitscost = [1500,1350,5000,500,3000,15000,250000,250000,21000,4800,6450,300,8000,1200,4000,1500,1200,2000,
+    15000,25000,26000,17000,17000,17000,17000,17000,75,200,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000,5000]
+    let ahitems = ['God Potion', 'Kismet Feather', 'Block Zapper', 'Kat Flower', 'Heat Core', 'Bits Talisman',
+     'Pure White Dye', 'Pure Black Dye', 'Autopet Rules 2-Pack', 'Portalizer', 'Abiphone Contacts Trio', 
+     'Hyper Catalyst Upgrade', 'Ultimate Carrot Candy Upgrade', 'Colossal Experience Bottle Upgrade',
+      'Jumbo Backpack Upgrade', 'Minion Storage', 'Matriarch\'s Perfume', 'Hologram',
+       'Sumsung© G3 Abicase', 'Sumsung© GG Abicase', 'Rezar® Abicase', 
+        'Actually Blue™ Abicase', 'Blue™ But Green Abicase', 'Blue™ But Yellow Abicase', 'Blue™ But Red Abicase', 'Lighter Blue™ Abicase',
+         'Inferno Fuel Block', 'Accessory Enrichment Swapper', 'Ferocity Enrichment', 'Health Enrichment', 
+         'Speed Enrichment', 'Strength Enrichment', 'Critical Damage Enrichment', 'Critical Chance Enrichment', 
+         'Intelligence Enrichment', 'Defense Enrichment', 'Magic Find Enrichment', 'Sea Creature Chance Enrichment', 'Attack Speed Enrichment'];
+for (let pages = 0; pages < total_pages; pages++) {
+  promises.push(fetch(`https://api.hypixel.net/skyblock/auctions?page=${pages}`).then(response => response.json()));
+}
+Promise.all(promises)
+  .then(data => {
+    for (let w = 0; w < ahitems.length; w++) {
+    let Auctions = [];
+    input = ahitems[w]
+    bitinput = ahbitscost[w]
+    for (let i = 0; i < data.length; i++) {
+      let newAuctions = data[i].auctions.filter(auction => auction.bin === true & auction.claimed === false & auction.item_name.toLowerCase().includes(input.toLowerCase()));
+      Auctions = Auctions.concat(newAuctions);
+    }
+    Auctions.sort(function(a, b) {
+    return (a.starting_bid) - (b.starting_bid);
+    });
+        if (Auctions.length !== 0) {output = output.concat([`<tr>
+                    <td>${Auctions[0].item_name}</td>
+                    <td>$${Math.round((Auctions[0].starting_bid)/bitinput)}</td>
+                    <td>${bitinput.toLocaleString("en-US")}</td>
+                    <td>$${(Auctions[0].starting_bid)/1000000}m</td>
+                    <td>${(Math.round((((Auctions[0].starting_bid)/bitinput)-(cookieprice/bitspercookie))*bitspercookie)).toLocaleString("en-US")}</td>
+                  </tr>`]);}}
+
+
+    fetch("https://api.hypixel.net/skyblock/bazaar")
+    .then(response => response.json())
+    .then(data => {
+    for (let w = 0; w < bzitems.length; w++) {
+    let product = bzitems[w]
+    bitinput = bzbitscost[w]
+    let productId = data.products[product].product_id.replace(/_/g, " ").toLowerCase();
+    productId = productId.split(" ").map(word => word[0].toUpperCase() + word.slice(1)).join(" ");
+    let price = Number(data.products[product].quick_status.buyPrice);
+    if (price) {output = output.concat([`<tr>
+                    <td>${(productId).toLocaleString("en-US")}</td>
+                    <td>$${Math.round(price/bitinput)}</td>
+                    <td>${bitinput.toLocaleString("en-US")}</td>
+                    <td>$${Math.round(price/1000000)}m</td>
+                    <td>${(Math.round(((price/bitinput)-(cookieprice/bitspercookie))*bitspercookie)).toLocaleString("en-US")}</td>
+                  </tr>`]);}}
+                  output.sort(function(a, b) {
+    let priceA = parseFloat(a.match(/\$([0-9.]+)/)[1]);
+    let priceB = parseFloat(b.match(/\$([0-9.]+)/)[1]);
+    return priceB - priceA;});
+    for (let i = 0; i < output.length; i++) {
+    output[i] = output[i].slice(0, 4) + "<td>" + `No. ${(i+1)}` + "</td>" + output[i].slice(4);}
+    localStorage.setItem("last_use_date", date.join(''));
+    document.getElementById("lastupdated").innerHTML = date.join('');
+    localStorage.setItem("last_use", output.join(''));
+    document.getElementById("data").innerHTML = output.join('');
+    console.log("Done");
+                })})})})
+              } finally {
+                await new Promise((resolve) => setTimeout(resolve, 5000));
+                isRunning = false;
+              }}
+          </script>
+          
+	</body>
+</html>

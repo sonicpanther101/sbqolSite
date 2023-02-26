@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="main.css">
+		<title>Flipper</title>
+		<link rel="icon" type="image/x-icon" href="icon.png">
+        <a class="logo" href="index.html">
+                <img src="logo.png" alt="Hypixel" height="50px">
+        </a>
+        <nav>
+            <a class="menu leftest" href="powder.html">Powder</a><a class="menu" href="Item searcher.html">Price checker</a><a class="menu" href="bits.html">Bits</a><a class="menu active" href="flipper.html">Flipper</a>
+        </nav>
+	</head>
+	<body>
+    <center><button onclick="loadAuctions();">Load Auctions</button>
+      <div><br></div>
+		<table class="transbacknomar">
+            <tr>
+              <th>Name </th>
+              <th>Rarity </th>
+              <th>Lowest Bin </th>
+              <th>Second Lowest Bin </th>
+              <th>Profit $</th>
+            </tr>
+            <tbody id="data"></tbody>
+          </table></center>
+          
+          <script>
+            //const sufix = itemName.match(/\s(✪|✪✪|✪✪✪|✪✪✪✪|✪✪✪✪✪|✪✪✪✪✪➊|✪✪✪✪✪➋|✪✪✪✪✪➌|✪✪✪✪✪➍|✪✪✪✪✪➎)$/);
+function loadAuctions() {
+  console.log("start")
+  const loadingbar = document.createElement('div');
+  loadingbar.classList.add('loadingbar');
+  fetch("https://api.hypixel.net/skyblock/auctions")
+    .then(response => response.json())
+    .then(data => {
+      let total_pages = Number(data.totalPages);
+      let promises = [];
+      let items = new Set();
+      let output = [];
+      document.getElementById("data").innerHTML = output.join('');
+      for (let pages = 0; pages < total_pages; pages++) {
+        promises.push(fetch(`https://api.hypixel.net/skyblock/auctions?page=${pages}`).then(response => response.json()));
+      }
+
+      Promise.all(promises)
+  .then(data => {
+    const itemsData = [].concat(...data.map(d => d.auctions))
+      .filter(a => !a.bin && !a.claimed && a.starting_bid < 5000000000)
+      .map(a => {
+        let itemName = a.item_name.trim();
+        const sufix = itemName.match(/\s(✪|✪✪|✪✪✪|✪✪✪✪)$/);
+        return sufix ? {itemName: itemName.slice(0, -sufix[0].length), startingBid: a.starting_bid} : {itemName, startingBid: a.starting_bid};
+      })
+      .map(a => {
+        const itemName = a.itemName.trim();
+        const prefix = itemName.match(/^(⚚ Spicy|Spicy|⚚ Sharp|Sharp|Epic|Fair|Fast|Gentle|Heroic|Legendary|⚚ Unreal|Unreal|Rich|⚚ Rapid|Rapid|Neat|Hasty|Grand|Fine|Deadly|Awkward|Clean|⚚ Fierce|Fierce|Heavy|Light|Mythic|Pure|Titanic|Smart|Wise|Glistening|Strengthened|Waxed|Fortified|Salty|Treacherous|Unyielding|Prospector's|Excellent|Sturdy|Fortunate|Great|Rugged|Lush|Lumberjack's|Double-Bit|Robust|Zooming|Pleasant|Green Thumb|Blessed|Bountiful|Moil|Toil|Ambered|Auspicious|Fleet|Heated|Magnetic|Mithraic|Refined|Stellar|Fruitful|Even More|Lucky|Stiff|Dirty|Chomp|Pitchin'|Candied|Submerged|Perfect|Reinforced|Renowned|Spiked|Hyper|Giant|Jaded|Cubic|⚚ Necrotic|Necrotic|Empowered|✿ Ancient|⚚ Ancient|Ancient|Undead|Loving|Ridiculous|Very|Highly|Extremely|Not So|Thicc|Absolutely|Precise|Spiritual|Headstrong|Coldfused|Fabled|Gilded|⚚ Suspicious|Suspicious|Warped|Withered|Bulky|Jerry's)\s/);
+        return prefix ? {itemName: itemName.slice(prefix[0].length), startingBid: a.starting_bid} : {itemName, startingBid: a.starting_bid};
+      });
+    const items = new Set(itemsData.map(i => i.itemName));
+    console.log("loaded fetch");
+    console.log("length of new items:");
+    console.log(items.size)
+    loadingbarpercent = 0;
+    itemsize = items.size;
+    let iterable = 0;
+          for (let item of items) {
+            iterable++;
+            loadingbarpercent = Math.round(iterable/itemsize*100);
+            loadingbar.innerHTML = `${loadingbarpercent}% loaded`;
+            document.body.appendChild(loadingbar);
+            let itm = "";
+            let itm2 = "";
+            let Lbin = Infinity;
+            let secondLbin = Infinity;
+            let lore = "";
+            let rarity = "";
+            let category = "";
+            let uuid = "";
+            let lore2 = "";
+            let rarity2 = "";
+            let category2 = "";
+            let uuid2 = "";
+            let auction1 = [];
+            for (let page of data) {
+              for (let auction of page.auctions) {
+                if (!auction.item_name.toLowerCase().includes(item.toLowerCase()) || !auction.bin || auction.claimed) continue;
+                if (auction.starting_bid < Lbin) {
+                  secondLbin = Lbin;
+                  Lbin = auction.starting_bid;
+                  rarity = auction.tier;
+                  lore = auction.item_lore;
+                  category = auction.category;
+                  uuid = auction.uuid;
+                  itm = auction.item_name;
+                  auction1 = auction;
+                } else if (auction.starting_bid < secondLbin) {
+                  secondLbin = auction.starting_bid;
+                  rarity2 = auction.tier;
+                  lore2 = auction.item_lore;
+                  category2 = auction.category;
+                  uuid2 = auction.uuid;
+                  itm2 = auction.item_name;
+                }
+              }
+            }
+            if (Lbin === Infinity) continue;if (secondLbin === Infinity) continue;if (rarity !== rarity2) continue;
+            if (secondLbin - Lbin > 100000) {
+              console.log('new item added');
+              console.log(uuid)
+              output = output.concat(`<tr>
+<td><span class="expandable" onclick="toggleHiddenText(this); copyToClipboard('${uuid}');">${item}</span><div class="hidden-text" style="display: none;">
+  <span class="linebelow">Lowest bin</span><br>
+  <span class="linebelow">Item Name: ${itm}</span><br>
+  <span class="linebelow">Rarity: ${rarity}</span><br>
+  <span class="linebelow">Category: ${category.charAt(0).toUpperCase() + (category.toLowerCase()).slice(1)}</span><br>
+  <span class="linebelow">UUID: ${uuid}</span><br>
+  Lore: <span class="thicklinebelow">${lore}</span><br>
+  <span class="linebelow">Second lowest bin</span><br>
+  <span class="linebelow">Item Name: ${itm2}</span><br>
+  <span class="linebelow">Rarity: ${rarity2}</span><br>
+  <span class="linebelow">Category: ${category2.charAt(0).toUpperCase() + (category2.toLowerCase()).slice(1)}</span><br>
+  <span class="linebelow">UUID: ${uuid2}</span><br>
+  Lore: <div class="lore"><span>${removeSymbol(lore2)}</span></div>
+</div></td>
+                    <td>${(rarity.toLowerCase()).charAt(0).toUpperCase() + (rarity.toLowerCase()).slice(1)}</td>
+                    <td>${(Lbin / 1000000)}m</td>
+                    <td>${(secondLbin / 1000000)}m</td>
+                    <td>$${Math.round((secondLbin - Lbin) / 1000000*0.98*1000)/1000}m</td>
+                  </tr>`);
+            }
+            console.log(iterable);
+
+          }
+          output.sort(function(a, b) {
+    let priceA = parseFloat(a.match(/\$([0-9.]+)/)[1]);
+    let priceB = parseFloat(b.match(/\$([0-9.]+)/)[1]);
+    return priceB - priceA;});
+          document.getElementById("data").innerHTML = output.join('');
+          console.log("done");
+        });
+    });
+}
+          </script>
+          <script>
+function toggleHiddenText(element) {
+  const hiddenText = element.nextElementSibling;
+  hiddenText.style.display = (hiddenText.style.display === "none") ? "block" : "none";
+}
+
+//Declaring a counter variable
+let counter = 3;
+
+//Defining the function 'copyToClipboard' that takes a parameter 'text'
+function copyToClipboard(text) {
+  //Increasing the value of counter by 1 on every call of the function
+  counter++;
+
+  //Checking if the counter is an even number
+  if (counter % 2 === 0) {
+    const cb = navigator.clipboard;
+    var textToCopy = `/viewauction ${text}`;
+    cb.writeText(textToCopy).then(() => {
+const snackbar = document.createElement('div');
+snackbar.classList.add('snackbar');
+snackbar.innerHTML = `Copied:<br> /viewauction ${text}<br>to clipboard`;
+document.body.appendChild(snackbar);
+snackbar.addEventListener('animationend', () => {
+  document.body.removeChild(snackbar);
+});
+    });
+  }
+}
+
+
+function removeSymbol(str) {
+  return str.replace(/§l§m /g, '<span class="bold">-</span>').replace(/§7§8§o/g, '</span><span class="italicgray">')
+  .replace(/§d§l§ka/g, '<span class="boldpink"><span class="random">a</span></span>').replace(/§f§l/g, '</span><span class="boldwhite">').replace(/§a§l/g, '</span><span class="boldgreen">').replace(/§9§l/g, '</span><span class="boldblue">').replace(/§5§l/g, '</span><span class="bolddark_purple">').replace(/§6§l/g, '</span><span class="boldgold">').replace(/§d§l/g, '</span><span class="boldpink">').replace(/§b§l/g, '</span><span class="boldaqua">').replace(/§c§l/g, '</span><span class="boldred">').replace(/§4§l/g, '</span><span class="bolddark_red">')
+    .replace(/§0/g, '</span><span class="black">').replace(/§1/g, '</span><span class="dark_blue">').replace(/§2/g, '</span><span class="dark_green">').replace(/§3/g, '</span><span class="dark_aqua">').replace(/§4/g, '</span><span class="dark_red">').replace(/§5/g, '</span><span class="dark_purple">').replace(/§6/g, '</span><span class="gold">').replace(/§7/g, '</span><br><span class="gray">').replace(/§8/g, '</span><span class="dark_gray">').replace(/§9/g, '</span><span class="blue">').replace(/§a/g, '</span><span class="green">').replace(/§b/g, '</span><span class="aqua">').replace(/§c/g, '</span><span class="red">').replace(/§d/g, '</span><span class="light_purple">').replace(/§e/g, '</span><span class="yellow">').replace(/§f/g, '</span><span class="white">').replace(/§g/g, '</span><span class="minecoin_gold">').replace(/§r/g, '').replace(/§ka/g, '').replace(/§l/g, '</span><span class="bold">');
+}
+
+function applyRandomFormatting() {
+  const elements = document.getElementsByClassName("random");
+
+  for (let i = 0; i < elements.length; i++) {
+    const element = elements[i];
+    let text = element.innerText;
+    let formattedText = "";
+
+    for (let j = 0; j < text.length; j++) {
+      formattedText += String.fromCharCode(Math.floor(Math.random() * (127 - 33) + 33));
+    }
+
+    element.innerText = formattedText;
+  }
+}
+setInterval(applyRandomFormatting, 50);
+          </script>
+          <p onclick="copyToClipboard('hi');">test</p>
+	</body>
+</html>

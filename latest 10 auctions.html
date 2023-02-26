@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="main.css">
+		<title>top 10 bin auctions</title>
+		<link rel="icon" type="image/x-icon" href="icon.png">
+        <a class="logo" href="index.html">
+                <img src="logo.png" alt="Hypixel" height="50px">
+        </a>
+        <nav>
+            <a class="menu leftest" href="powder.html">Powder</a><a class="menu active" href="bits.html">Bits</a><a class="menu" href="flipper.html">Flipper</a>
+        </nav>
+	</head>
+	<body>
+		<table>
+            <tr>
+              <th>No.</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Lowest Bin</th>
+              <th>Last Updated</th>
+            </tr>
+            <tbody class="transback" id="data"></tbody>
+          </table>
+          
+          <script>
+          fetch("https://api.hypixel.net/skyblock/auctions")
+  .then(response => response.json())
+  .then(data => {
+    let output = "";
+    let binAuctions = data.auctions.filter(auction => auction.bin === true & auction.claimed === false);
+    console.log(binAuctions)
+    for (let i = 0; i < 10; i++) {
+      let lastUpdated = new Date(binAuctions[i].last_updated).toLocaleString();
+      let lowestBin = binAuctions.filter(auction => auction.item_name === binAuctions[i].item_name)
+                           .sort((a, b) => (a.starting_bid ?? 0) - (b.starting_bid ?? 0))[0].starting_bid / 1000000;
+      output += `<tr>
+                  <td>No. ${i+1}</td>
+                  <td>${binAuctions[i].item_name}</td>
+                  <td>$${(binAuctions[i].starting_bid)/1000000}m</td>
+                  <td>$${lowestBin}m</td>
+                  <td>${lastUpdated}</td>
+                </tr>`;
+    }
+    document.getElementById("data").innerHTML = output;
+    console.log(typeof binAuctions);
+  })
+  .catch(error => console.log(error));
+          </script>
+          
+	</body>
+</html>
